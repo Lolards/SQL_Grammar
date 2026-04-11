@@ -1,4 +1,4 @@
-# SQL Grammar Recognizer
+# SQL Query Grammar 
 **Evidence 2**: Evidence Generating and Cleaning a Restricted Context Free Grammar
 
 **Course**: Implementation of Computational Methods
