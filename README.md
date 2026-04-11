@@ -92,3 +92,9 @@ O       ->  'ORDER' 'BY' COL | 'ORDER' 'BY' COL 'ASC' | 'ORDER' 'BY' COL 'DESC'
 10. `V`: Values for conditions.
 
 11. `O -> 'ORDER' 'BY' COL | ...`: An ORDER BY clause sorts results by a column, optionally specifying ASC or DESC direction.
+
+## References
+
+Jonker, A., & Mucci, T. (2025, November 27). SQL. What is Structured Query Language? Retrieved April 11, 2026, from https://www.ibm.com/mx-es/think/topics/structured-query-language
+
+GeeksforGeeks. (2026, January 13). SQL SELECT query. GeeksforGeeks. https://www.geeksforgeeks.org/sql/sql-select-query/
