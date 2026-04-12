@@ -179,6 +179,58 @@ O       ->  'ORDER' 'BY' COL
           | 'ORDER' 'BY' COL 'DESC_A
 ```
 
+## Implementation
+ 
+To test this grammar, I've implemented it in Python using the Natural Language Toolkit (NLTK). According to its documentation, NLTK is a platform for building Python programs to work with human language data. The `CFG` class from NLTK lets us define a context-free grammar, and the `ChartParser` can then parse sentences against it.
+ 
+```python
+import nltk
+from nltk import CFG
+ 
+sql_grammar = CFG.fromstring("""
+    S      -> SELECT
+    SELECT -> 'SELECT' COLS 'FROM' T
+    SELECT -> 'SELECT' COLS 'FROM' T W
+    SELECT -> 'SELECT' COLS 'FROM' T O
+    SELECT -> 'SELECT' COLS 'FROM' T W O
+    COLS   -> COL COLS_A
+    COLS_A -> ',' COL COLS_A
+    COLS_A ->
+    COL    -> 'name' | 'age' | 'id' | 'email' | '*'
+    T      -> 'users' | 'orders' | 'products' | 'employees'
+    W      -> 'WHERE' C
+    C      -> CA C_A
+    C_A    -> 'OR' CA C_A
+    C_A    ->
+    CA     -> CATOM CA_A
+    CA_A   -> 'AND' CATOM CA_A
+    CA_A   ->
+    CATOM  -> F OP V
+    F      -> 'age' | 'id' | 'name' | 'email'
+    OP     -> '=' | '>' | '<' | '>=' | '<='
+    V      -> 'NULL' | '0' | '1' | '18' | '25' | '100' | '1000'
+    O      -> 'ORDER' 'BY' COL
+    O      -> 'ORDER' 'BY' COL 'ASC_A
+    O      -> 'ORDER' 'BY' COL 'DESC_A
+""")
+ 
+parser = nltk.ChartParser(sql_grammar)
+ 
+def tokenize(sentence):
+    return sentence.strip().split()
+ 
+def recognize(sentence):
+    tokens = tokenize(sentence)
+    trees = list(parser.parse(tokens))
+    if trees:
+        print(f"VALID: '{sentence}'")
+        trees[0].pretty_print()
+    else:
+        print(f"INVALID: '{sentence}'")
+```
+ 
+First, we load the cleaned grammar using `CFG.fromstring`, then create a `ChartParser` with it. The `tokenize` function simply splits the sentence by spaces, since all terminals in this grammar are single space-separated tokens. Finally, `recognize` attempts to parse the token list and prints the resulting tree if the sentence is valid.
+
 ## References
 
 Jonker, A., & Mucci, T. (2025, November 27). SQL. What is Structured Query Language? Retrieved April 11, 2026, from https://www.ibm.com/mx-es/think/topics/structured-query-language
@@ -190,3 +242,9 @@ GeeksforGeeks. (2025, May 23). Ambiguity in Context free Grammar and Context fre
 GeeksforGeeks. (2026b, April 11). Ambiguous grammar. GeeksforGeeks. https://www.geeksforgeeks.org/compiler-design/ambiguous-grammar/
 
 GeeksforGeeks. (2025b, July 12). Removing direct and indirect left recursion in a grammar. GeeksforGeeks. https://www.geeksforgeeks.org/dsa/removing-direct-and-indirect-left-recursion-in-a-grammar/
+
+NLTK :: Natural Language Toolkit. (n.d.). https://www.nltk.org/
+
+NLTK :: nltk.parse.chart module. (n.d.). https://www.nltk.org/api/nltk.parse.chart.html
+
+NLTK :: nltk.grammar.CFG. (n.d.). https://www.nltk.org/api/nltk.grammar.CFG.html
