@@ -280,6 +280,14 @@ python SQLGrammar.py
 
 It will print whether the sentence is valid or invalid, and if valid it will also display the parse tree.
 
+## Chomsky Hierarchy
+
+According to the Chomsky hierarchy (Chomsky, 1956), grammars are classified into four types: Unrestricted (Type 0), Context-Sensitive (Type 1), Context-Free (Type 2), and Regular (Type 3).
+
+**Before cleaning:** The initial grammar is a Type 2: Context-Free Grammar. This is because every rule has a single non-terminal on the left-hand side, and the right-hand side contains more than one symbol, which rules out Regular grammar. However it is not suitable for deterministic parsing because of the ambiguity in `C` and the left recursion in `COLS` and `C`.
+
+**After cleaning:** The grammar remains a Type 2: Context-Free Grammar. Removing ambiguity and left recursion does not change the class of the language or the set of strings it accepts, it only restructures the productions so a deterministic top-down parser can process it without ambiguity or infinite loops.
+
 ## References
 
 Jonker, A., & Mucci, T. (2025, November 27). SQL. What is Structured Query Language? Retrieved April 11, 2026, from https://www.ibm.com/mx-es/think/topics/structured-query-language
@@ -297,3 +305,5 @@ NLTK :: Natural Language Toolkit. (n.d.). https://www.nltk.org/
 NLTK :: nltk.parse.chart module. (n.d.). https://www.nltk.org/api/nltk.parse.chart.html
 
 NLTK :: nltk.grammar.CFG. (n.d.). https://www.nltk.org/api/nltk.grammar.CFG.html
+
+Anuradhac, A. (2021, June 28). Chomsky hierarchy. Devopedia. https://devopedia.org/chomsky-hierarchy
