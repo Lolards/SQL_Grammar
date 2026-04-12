@@ -294,7 +294,7 @@ Because this code goes through a list of tokens and then parses them, the comple
 
 **Tokenization:** splitting the input into tokens by iterating over each character is O(n), where n is the length of the sentence.
 
-**Parsing:** the `ChartParser` in NLTK uses a general chart parsing algorithm. According to Aho et al. (2006), this runs in O(n³ · |G|), where n is the number of tokens and |G| is the size of the grammar. This includes building the chart and performing the table-driven parse.
+**Parsing:** the `ChartParser` in NLTK uses a general chart parsing algorithm. This runs in O(n³ · |G|), where n is the number of tokens and |G| is the size of the grammar. This includes building the chart and performing the table-driven parse.
 
 So the overall complexity is O(n) + O(n³ · |G|), which simplifies to **O(n³ · |G|)**, dominated by the parsing step.
 
@@ -327,6 +327,8 @@ NLTK :: nltk.grammar.CFG. (n.d.). https://www.nltk.org/api/nltk.grammar.CFG.ht
 Anuradhac, A. (2021, June 28). Chomsky hierarchy. Devopedia. https://devopedia.org/chomsky-hierarchy
 
 Adams, M. D., Hollenbeck, C., & Might, M. (2016). On the complexity and performance of parsing with derivatives. Proceedings of the 37th ACM SIGPLAN Conference on Programming Language Design and Implementation, 224–236. https://doi.org/10.1145/2908080.2908128
+
+Wikipedia contributors. (2026, March 21). Regular grammar. Wikipedia. https://en.wikipedia.org/wiki/Regular_grammar
 
 Wikipedia contributors. (2025, November 6). Context-sensitive language. Wikipedia. https://en.wikipedia.org/wiki/Context-sensitive_language
 
