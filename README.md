@@ -288,6 +288,24 @@ According to the Chomsky hierarchy (Chomsky, 1956), grammars are classified into
 
 **After cleaning:** The grammar remains a Type 2: Context-Free Grammar. Removing ambiguity and left recursion does not change the class of the language or the set of strings it accepts, it only restructures the productions so a deterministic top-down parser can process it without ambiguity or infinite loops.
 
+## Complexity
+
+Because this code goes through a list of tokens and then parses them, the complexity needs to be analyzed in two steps.
+
+**Tokenization:** splitting the input into tokens by iterating over each character is O(n), where n is the length of the sentence.
+
+**Parsing:** the `ChartParser` in NLTK uses a general chart parsing algorithm. According to Aho et al. (2006), this runs in O(n³ · |G|), where n is the number of tokens and |G| is the size of the grammar. This includes building the chart and performing the table-driven parse.
+
+So the overall complexity is O(n) + O(n³ · |G|), which simplifies to **O(n³ · |G|)**, dominated by the parsing step.
+
+It is also worth noting that the complexity of parsing varies depending on the level of the grammar in the Chomsky hierarchy:
+
+- **Type 3 - Regular:** can be parsed in O(n) using a finite automaton. An example of a string at this level would be something like `aabbb`, recognized by a simple DFA that counts characters.
+- **Type 2 - Context-Free:** parsed in O(n³) in the general case, which is the level of this grammar. An example is `SELECT * FROM users`, where the parser must build a tree tracking nested structure like column lists and conditions.
+- **Type 1 - Context-Sensitive:** no general efficient algorithm exists, parsing is PSPACE-complete. An example would be a language like `aⁿbⁿcⁿ` where the number of a's, b's and c's must all match.
+- **Type 0 - Unrestricted:** undecidable in the general case, there is no algorithm guaranteed to halt. An example is the halting problem itself.
+
+
 ## References
 
 Jonker, A., & Mucci, T. (2025, November 27). SQL. What is Structured Query Language? Retrieved April 11, 2026, from https://www.ibm.com/mx-es/think/topics/structured-query-language
@@ -307,3 +325,9 @@ NLTK :: nltk.parse.chart module. (n.d.). https://www.nltk.org/api/nltk.parse.c
 NLTK :: nltk.grammar.CFG. (n.d.). https://www.nltk.org/api/nltk.grammar.CFG.html
 
 Anuradhac, A. (2021, June 28). Chomsky hierarchy. Devopedia. https://devopedia.org/chomsky-hierarchy
+
+Adams, M. D., Hollenbeck, C., & Might, M. (2016). On the complexity and performance of parsing with derivatives. Proceedings of the 37th ACM SIGPLAN Conference on Programming Language Design and Implementation, 224–236. https://doi.org/10.1145/2908080.2908128
+
+Wikipedia contributors. (2025, November 6). Context-sensitive language. Wikipedia. https://en.wikipedia.org/wiki/Context-sensitive_language
+
+Wikipedia contributors. (2025b, December 10). Unrestricted grammar. Wikipedia. https://en.wikipedia.org/wiki/Unrestricted_grammar
