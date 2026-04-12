@@ -129,28 +129,28 @@ A' ->  α A' | ε
 Where `ε` represents the empty string (the rule can produce nothing).
 
 **Fixing COLS:**
-
+ 
 Original: `COLS -> COL | COLS ',' COL`
-
+ 
 After elimination:
 ```
-COLS   ->  COL COLS'
-COLS' ->  ',' COL COLS' | ε
+COLS   ->  COL COLS_A
+COLS_A ->  ',' COL COLS_A | ε
 ```
-
+ 
 **Fixing C and CA** (after the ambiguity fix, both still had left recursion):
-
+ 
 Original: `C -> CA | C 'OR' CA` and `CA -> CATOM | CA 'AND' CATOM`
-
+ 
 After elimination:
 ```
-C    ->  CA C'
-C'  ->  'OR' CA C' | ε
-
-CA   ->  CATOM CA'
-CA' ->  'AND' CATOM CA' | ε
+C    ->  CA C_A
+C_A  ->  'OR' CA C_A | ε
+ 
+CA   ->  CATOM CA_A
+CA_A ->  'AND' CATOM CA_A | ε
 ```
-
+ 
 ## Final Cleaned Grammar
  
 After applying both fixes, the final grammar is:
@@ -161,22 +161,22 @@ SELECT  ->  'SELECT' COLS 'FROM' T
           | 'SELECT' COLS 'FROM' T W
           | 'SELECT' COLS 'FROM' T O
           | 'SELECT' COLS 'FROM' T W O
-COLS    ->  COL COLS'
-COLS'  ->  ',' COL COLS' | ε
+COLS    ->  COL COLS_A
+COLS_A  ->  ',' COL COLS_A | ε
 COL     ->  'name' | 'age' | 'id' | 'email' | '*'
 T       ->  'users' | 'orders' | 'products' | 'employees'
 W       ->  'WHERE' C
-C       ->  CA C'
-C'     ->  'OR' CA C' | ε
-CA      ->  CATOM CA'
-CA'    ->  'AND' CATOM CA' | ε
+C       ->  CA C_A
+C_A     ->  'OR' CA C_A | ε
+CA      ->  CATOM CA_A
+CA_A    ->  'AND' CATOM CA_A | ε
 CATOM   ->  F OP V
 F       ->  'age' | 'id' | 'name' | 'email'
 OP      ->  '=' | '>' | '<' | '>=' | '<='
 V       ->  'NULL' | '0' | '1' | '18' | '25' | '100' | '1000'
 O       ->  'ORDER' 'BY' COL
-          | 'ORDER' 'BY' COL 'ASC'
-          | 'ORDER' 'BY' COL 'DESC'
+          | 'ORDER' 'BY' COL 'ASC_A
+          | 'ORDER' 'BY' COL 'DESC_A
 ```
 
 ## References
