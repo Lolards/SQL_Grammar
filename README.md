@@ -115,6 +115,70 @@ CA     ->  CATOM | CA 'AND' CATOM
 CATOM  ->  F OP V
 ```
 
+## Removing Left Recursion
+
+A grammar has left recursion when a non-terminal appears as the first symbol in one of its own productions, for example `COLS -> COLS ',' COL`. This causes top-down parsers to loop infinitely because they would keep trying to expand `COLS` without ever consuming any input.
+
+The standard technique to eliminate left recursion from a rule of the form `A -> A α | β` is to rewrite it as:
+
+```
+A  ->  β A'
+A' ->  α A' | ε
+```
+
+Where `ε` represents the empty string (the rule can produce nothing).
+
+**Fixing COLS:**
+
+Original: `COLS -> COL | COLS ',' COL`
+
+After elimination:
+```
+COLS   ->  COL COLS'
+COLS' ->  ',' COL COLS' | ε
+```
+
+**Fixing C and CA** (after the ambiguity fix, both still had left recursion):
+
+Original: `C -> CA | C 'OR' CA` and `CA -> CATOM | CA 'AND' CATOM`
+
+After elimination:
+```
+C    ->  CA C'
+C'  ->  'OR' CA C' | ε
+
+CA   ->  CATOM CA'
+CA' ->  'AND' CATOM CA' | ε
+```
+
+## Final Cleaned Grammar
+ 
+After applying both fixes, the final grammar is:
+ 
+```
+S       ->  SELECT
+SELECT  ->  'SELECT' COLS 'FROM' T
+          | 'SELECT' COLS 'FROM' T W
+          | 'SELECT' COLS 'FROM' T O
+          | 'SELECT' COLS 'FROM' T W O
+COLS    ->  COL COLS'
+COLS'  ->  ',' COL COLS' | ε
+COL     ->  'name' | 'age' | 'id' | 'email' | '*'
+T       ->  'users' | 'orders' | 'products' | 'employees'
+W       ->  'WHERE' C
+C       ->  CA C'
+C'     ->  'OR' CA C' | ε
+CA      ->  CATOM CA'
+CA'    ->  'AND' CATOM CA' | ε
+CATOM   ->  F OP V
+F       ->  'age' | 'id' | 'name' | 'email'
+OP      ->  '=' | '>' | '<' | '>=' | '<='
+V       ->  'NULL' | '0' | '1' | '18' | '25' | '100' | '1000'
+O       ->  'ORDER' 'BY' COL
+          | 'ORDER' 'BY' COL 'ASC'
+          | 'ORDER' 'BY' COL 'DESC'
+```
+
 ## References
 
 Jonker, A., & Mucci, T. (2025, November 27). SQL. What is Structured Query Language? Retrieved April 11, 2026, from https://www.ibm.com/mx-es/think/topics/structured-query-language
@@ -124,3 +188,5 @@ GeeksforGeeks. (2026, January 13). SQL SELECT query. GeeksforGeeks. https://www.
 GeeksforGeeks. (2025, May 23). Ambiguity in Context free Grammar and Context free Languages. GeeksforGeeks. https://www.geeksforgeeks.org/theory-of-computation/ambiguity-in-context-free-grammar-and-context-free-languages/
 
 GeeksforGeeks. (2026b, April 11). Ambiguous grammar. GeeksforGeeks. https://www.geeksforgeeks.org/compiler-design/ambiguous-grammar/
+
+GeeksforGeeks. (2025b, July 12). Removing direct and indirect left recursion in a grammar. GeeksforGeeks. https://www.geeksforgeeks.org/dsa/removing-direct-and-indirect-left-recursion-in-a-grammar/
