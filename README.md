@@ -231,6 +231,55 @@ def recognize(sentence):
  
 First, we load the cleaned grammar using `CFG.fromstring`, then create a `ChartParser` with it. The `tokenize` function simply splits the sentence by spaces, since all terminals in this grammar are single space-separated tokens. Finally, `recognize` attempts to parse the token list and prints the resulting tree if the sentence is valid.
 
+## Testing
+ 
+To test this grammar, the following sentences are used:
+ 
+**Valid sentences:**
+- `SELECT * FROM users`
+- `SELECT name , age FROM employees`
+- `SELECT id FROM orders WHERE age > 18`
+- `SELECT name FROM products WHERE id = 1 AND age >= 18`
+- `SELECT * FROM users WHERE age > 0 OR id = 1`
+- `SELECT name FROM employees ORDER BY age ASC`
+- `SELECT id , email FROM users WHERE id = 100 ORDER BY name DESC`
+- `SELECT * FROM products WHERE age >= 18 AND id < 1000 OR name = NULL`
+ 
+**Invalid sentences:**
+- `SELECT FROM users` — missing column list
+- `SELECT * FROM` — missing table
+- `SELECT * FROM users WHERE` — WHERE with no condition
+- `SELECT * FROM accounts` — `accounts` is not in the grammar
+- `SELECT salary FROM users` — `salary` is not a valid column
+- `SELECT * FROM users ORDER age` — missing `BY` keyword
+- `SELECT * FROM users WHERE age > 200` — `200` is not a valid value
+ 
+After running the program, the parse trees for the valid sentences would look like this:
+
+<img width="390" height="229" alt="imagen" src="https://github.com/user-attachments/assets/3b8a1eba-dc13-4988-8da4-ca37a306d1af" />
+<img width="552" height="226" alt="imagen" src="https://github.com/user-attachments/assets/c2d6fc4a-5c0f-4232-aef2-83179c1d5b19" />
+
+There is a file named `SQLGrammar.py` where you can test any of these cases.
+To test a sentence, simply call the `recognize` function at the bottom of the script with the sentence you want to test:
+
+```python
+recognize("SELECT * FROM users")
+```
+
+Keep in mind that all tokens must be separated by spaces, including commas, so a multi-column query would look like this:
+
+```python
+recognize("SELECT name , age FROM users")
+```
+
+Then run the script with:
+
+```
+python SQLGrammar.py
+```
+
+It will print whether the sentence is valid or invalid, and if valid it will also display the parse tree.
+
 ## References
 
 Jonker, A., & Mucci, T. (2025, November 27). SQL. What is Structured Query Language? Retrieved April 11, 2026, from https://www.ibm.com/mx-es/think/topics/structured-query-language
