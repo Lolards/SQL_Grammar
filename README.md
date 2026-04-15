@@ -8,7 +8,7 @@
 
 SQL (Structured Query Language) is a standardized, domain-specific programming language that is used to interact with relational database management systems (RDBMS) such as MySQL, SQL Server, IBM Db2, PostgreSQL, and Oracle Database. It was first developed at IBM in the 1970s by Donald D. Chamberlin and Raymond F. Boyce, and has since become the most widely used database language in the world (Chamberlin & Boyce, 1974). SQL is formally defined as a context-free language, which means its syntax can be fully described using a Context-Free Grammar (CFG).
 
-For this evidence, a restricted subset of SQL `SELECT` queries was chosen. The grammar covers the most common and essential parts of a SQL query: selecting columns, specifying a table, optionally filtering with `WHERE`, and optionally ordering results with `ORDER BY`.
+For this evidence, a restricted subset of SQL `SELECT` queries was chosen (DQL). The grammar covers the most common and essential parts of a SQL query: selecting columns, specifying a table, optionally filtering with `WHERE`, and optionally ordering results with `ORDER BY`.
 
 ## SQL Structure
 
