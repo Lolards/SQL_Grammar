@@ -115,6 +115,23 @@ CA     ->  CATOM | CA 'AND' CATOM
 CATOM  ->  F OP V
 ```
 
+## Removing Redundancy
+
+The initial `SELECT` rule repeats `'SELECT' COLS 'FROM' T` in all four productions, which is redundant:
+```
+SELECT  ->  'SELECT' COLS 'FROM' T
+          | 'SELECT' COLS 'FROM' T W
+          | 'SELECT' COLS 'FROM' T O
+          | 'SELECT' COLS 'FROM' T W O
+```
+To fix this, we extract the common prefix into a single production and introduce a new non-terminal TAIL that handles all the optional clause combinations:
+
+```
+SELECT  ->  'SELECT' COLS 'FROM' T TAIL
+TAIL    ->  W O | W | O | ε
+```
+Now `'SELECT' COLS 'FROM' T` appears only once, and `TAIL` covers all four possible endings
+
 ## Removing Left Recursion
 
 A grammar has left recursion when a non-terminal appears as the first symbol in one of its own productions, for example `COLS -> COLS ',' COL`. This causes top-down parsers to loop infinitely because they would keep trying to expand `COLS` without ever consuming any input.
@@ -154,13 +171,10 @@ CA_A ->  'AND' CATOM CA_A | ε
 ## Final Cleaned Grammar
  
 After applying both fixes, the final grammar is:
- 
 ```
 S       ->  SELECT
-SELECT  ->  'SELECT' COLS 'FROM' T
-          | 'SELECT' COLS 'FROM' T W
-          | 'SELECT' COLS 'FROM' T O
-          | 'SELECT' COLS 'FROM' T W O
+SELECT  ->  'SELECT' COLS 'FROM' T TAIL
+TAIL    ->  W O | W | O | ε
 COLS    ->  COL COLS_A
 COLS_A  ->  ',' COL COLS_A | ε
 COL     ->  'name' | 'age' | 'id' | 'email' | '*'
@@ -175,9 +189,10 @@ F       ->  'age' | 'id' | 'name' | 'email'
 OP      ->  '=' | '>' | '<' | '>=' | '<='
 V       ->  'NULL' | '0' | '1' | '18' | '25' | '100' | '1000'
 O       ->  'ORDER' 'BY' COL
-          | 'ORDER' 'BY' COL 'ASC_A
-          | 'ORDER' 'BY' COL 'DESC_A
+          | 'ORDER' 'BY' COL 'ASC'
+          | 'ORDER' 'BY' COL 'DESC'
 ```
+
 
 ## Implementation
  
@@ -186,13 +201,14 @@ To test this grammar, I've implemented it in Python using the Natural Language T
 ```python
 import nltk
 from nltk import CFG
- 
+
 sql_grammar = CFG.fromstring("""
     S      -> SELECT
-    SELECT -> 'SELECT' COLS 'FROM' T
-    SELECT -> 'SELECT' COLS 'FROM' T W
-    SELECT -> 'SELECT' COLS 'FROM' T O
-    SELECT -> 'SELECT' COLS 'FROM' T W O
+    SELECT -> 'SELECT' COLS 'FROM' T TAIL
+    TAIL   -> W O
+    TAIL   -> W
+    TAIL   -> O
+    TAIL   ->
     COLS   -> COL COLS_A
     COLS_A -> ',' COL COLS_A
     COLS_A ->
@@ -210,15 +226,15 @@ sql_grammar = CFG.fromstring("""
     OP     -> '=' | '>' | '<' | '>=' | '<='
     V      -> 'NULL' | '0' | '1' | '18' | '25' | '100' | '1000'
     O      -> 'ORDER' 'BY' COL
-    O      -> 'ORDER' 'BY' COL 'ASC_A
-    O      -> 'ORDER' 'BY' COL 'DESC_A
+    O      -> 'ORDER' 'BY' COL 'ASC'
+    O      -> 'ORDER' 'BY' COL 'DESC'
 """)
- 
+
 parser = nltk.ChartParser(sql_grammar)
- 
+
 def tokenize(sentence):
     return sentence.strip().split()
- 
+
 def recognize(sentence):
     tokens = tokenize(sentence)
     trees = list(parser.parse(tokens))
