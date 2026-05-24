@@ -338,6 +338,12 @@ It is also worth noting that the complexity of parsing varies depending on the l
 - **Type 1 - Context-Sensitive:** no general efficient algorithm exists, parsing is PSPACE-complete. An example would be a language like `aⁿbⁿcⁿ` where the number of a's, b's and c's must all match.
 - **Type 0 - Unrestricted:** undecidable in the general case, there is no algorithm guaranteed to halt. An example is the halting problem itself.
 
+To better understand the performance of the parser, it is useful to distinguish between the three cases:
+
+- **Best case:** The sentence is rejected immediately because the first token is not in the grammar's vocabulary, raising a `ValueError` before any parsing begins. This is O(1) effectively, since no chart is built.
+- **Average case:** The sentence is a valid or invalid query of moderate length, with a simple condition or no condition at all, such as `SELECT * FROM users WHERE age > 18`. The parser builds the chart and finds the result in O(n³ · |G|), where n is small and the grammar branches are limited.
+- **Worst case:** The sentence is long and has a complex nested condition with multiple AND and OR operators, such as `SELECT name FROM employees WHERE age >= 18 AND id < 1000 OR name = NULL ORDER BY age DESC`. The parser must explore all possible derivations across the full chart, reaching the upper bound of O(n³ · |G|).
+
 
 ## References
 
