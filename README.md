@@ -232,66 +232,83 @@ sql_grammar = CFG.fromstring("""
 
 parser = nltk.ChartParser(sql_grammar)
 
+# Tokenize: 
 def tokenize(sentence):
     return sentence.strip().split()
 
+# Recognize a sentence
 def recognize(sentence):
     tokens = tokenize(sentence)
-    trees = list(parser.parse(tokens))
-    if trees:
-        print(f"VALID: '{sentence}'")
-        trees[0].pretty_print()
-    else:
+    try:
+        trees = list(parser.parse(tokens))
+        if trees:
+            print(f"VALID: '{sentence}'")
+            trees[0].pretty_print()
+        else:
+            print(f"INVALID: '{sentence}'")
+    except ValueError:
         print(f"INVALID: '{sentence}'")
 ```
  
-First, we load the cleaned grammar using `CFG.fromstring`, then create a `ChartParser` with it. The `tokenize` function simply splits the sentence by spaces, since all terminals in this grammar are single space-separated tokens. Finally, `recognize` attempts to parse the token list and prints the resulting tree if the sentence is valid.
+First, we load the cleaned grammar using `CFG.fromstring`, then create a `ChartParser` with it. The `tokenize` function simply splits the sentence by spaces, since all terminals in this grammar are single space-separated tokens. Finally, `recognize` attempts to parse the token list and prints the resulting tree if the sentence is valid. If the sentence contains words outside the grammar's vocabulary, the parser raises a `ValueError` which is caught and treated as an invalid sentence.
 
 ## Testing
  
-To test this grammar, the following sentences are used:
+To test this grammar, I implemented the following sentences. There is a file named SQLGrammar.py where you can run all of them at once.
  
 **Valid sentences:**
 - `SELECT * FROM users`
+- `SELECT name FROM users`
 - `SELECT name , age FROM employees`
-- `SELECT id FROM orders WHERE age > 18`
+- `SELECT id , name , email FROM products`
+- `SELECT * FROM orders`
+- `SELECT * FROM users WHERE age > 18`
+- `SELECT name FROM employees WHERE id = 1`
+- `SELECT * FROM products WHERE age >= 25`
+- `SELECT email FROM users WHERE name = NULL`
+- `SELECT * FROM orders WHERE id < 100`
 - `SELECT name FROM products WHERE id = 1 AND age >= 18`
+- `SELECT * FROM users WHERE age > 0 AND id < 1000`
+- `SELECT id FROM employees WHERE age >= 18 AND age <= 100`
 - `SELECT * FROM users WHERE age > 0 OR id = 1`
-- `SELECT name FROM employees ORDER BY age ASC`
-- `SELECT id , email FROM users WHERE id = 100 ORDER BY name DESC`
+- `SELECT name FROM orders WHERE id = 0 OR id = 1`
 - `SELECT * FROM products WHERE age >= 18 AND id < 1000 OR name = NULL`
- 
+- `SELECT id FROM users WHERE age > 18 AND id = 1 OR name = NULL`
+- `SELECT name FROM employees ORDER BY age ASC`
+- `SELECT * FROM users ORDER BY id DESC`
+- `SELECT * FROM orders ORDER BY name`
+- `SELECT id , email FROM users WHERE id = 100 ORDER BY name DESC`
+- `SELECT * FROM products WHERE age >= 18 ORDER BY id ASC`
+- `SELECT name FROM employees WHERE age > 25 AND id < 100 ORDER BY age DESC`
+
 **Invalid sentences:**
 - `SELECT FROM users` — missing column list
 - `SELECT * FROM` — missing table
 - `SELECT * FROM users WHERE` — WHERE with no condition
+- `SELECT * FROM users ORDER age` — missing `BY` keyword
+- `FROM users` — missing SELECT keyword
 - `SELECT * FROM accounts` — `accounts` is not in the grammar
 - `SELECT salary FROM users` — `salary` is not a valid column
-- `SELECT * FROM users ORDER age` — missing `BY` keyword
 - `SELECT * FROM users WHERE age > 200` — `200` is not a valid value
+- `SELECT * FROM users WHERE city = 1` — `city` is not a valid field
+- `SELECT * FROM users WHERE age != 18` — `!=` is not a valid operator
  
 After running the program, the parse trees for the valid sentences would look like this:
 
-<img width="390" height="229" alt="imagen" src="https://github.com/user-attachments/assets/3b8a1eba-dc13-4988-8da4-ca37a306d1af" />
-<img width="552" height="226" alt="imagen" src="https://github.com/user-attachments/assets/c2d6fc4a-5c0f-4232-aef2-83179c1d5b19" />
+<img width="602" height="285" alt="image" src="https://github.com/user-attachments/assets/ff8c87fd-0b83-4c1c-9b60-fca1ff35ced5" />
+<img width="1102" height="463" alt="image" src="https://github.com/user-attachments/assets/97e4df06-f01e-4636-86f8-847d9988f3a1" />
 
-There is a file named `SQLGrammar.py` where you can test any of these cases.
-To test a sentence, simply call the `recognize` function at the bottom of the script with the sentence you want to test:
+To test the cases, first create a virtual environment and install nltk:
 
-```python
-recognize("SELECT * FROM users")
 ```
-
-Keep in mind that all tokens must be separated by spaces, including commas, so a multi-column query would look like this:
-
-```python
-recognize("SELECT name , age FROM users")
+python -m venv venv
+venv/bin/pip install nltk
 ```
 
 Then run the script with:
 
 ```
-python SQLGrammar.py
+venv/bin/python SQLGrammar.py
 ```
 
 It will print whether the sentence is valid or invalid, and if valid it will also display the parse tree.
