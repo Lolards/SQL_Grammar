@@ -3,10 +3,11 @@ from nltk import CFG
 
 sql_grammar = CFG.fromstring("""
     S      -> SELECT
-    SELECT -> 'SELECT' COLS 'FROM' T
-    SELECT -> 'SELECT' COLS 'FROM' T W
-    SELECT -> 'SELECT' COLS 'FROM' T O
-    SELECT -> 'SELECT' COLS 'FROM' T W O
+    SELECT -> 'SELECT' COLS 'FROM' T TAIL
+    TAIL   -> W O
+    TAIL   -> W
+    TAIL   -> O
+    TAIL   ->
     COLS   -> COL COLS_A
     COLS_A -> ',' COL COLS_A
     COLS_A ->
